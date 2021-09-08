@@ -74,3 +74,4 @@ class net:
     def test(self):
         if self.opt.model in ("GAN", "cGAN", "DCGAN"):
             self.net.load_networks()
+        #######
