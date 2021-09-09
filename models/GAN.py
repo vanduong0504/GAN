@@ -98,8 +98,7 @@ class GANModel(base):
         self.optimize_D = optim.Adam(self.D.parameters(), lr=opt.lr)
         self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr)
 
-    def set_input(self, input, label):
-        self.label = label.to(self.opt.device)
+    def set_input(self, input, label = None):
         self.real = input.view(input.size(0),-1).to(self.opt.device)
         self.noise = torch.randn(input.size(0), self.noise_dim).to(self.opt.device)
 
