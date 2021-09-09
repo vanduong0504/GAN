@@ -69,7 +69,6 @@ class Discriminator(nn.Module):
         if type is True:
             layer += [nn.BatchNorm1d(num_features=out_cha)]
             layer += [nn.LeakyReLU(negative_slope=0.2, inplace=True)]
-            layer += [nn.Dropout(p=0.5)]
 
         return nn.Sequential(*layer)
 
@@ -134,12 +133,14 @@ class GANModel(base):
         """
         self.forward()
 
-        # Discriminator
+        # Discriminator 
+        self.set_requires_grad([self.G], False)
         self.optimize_D.zero_grad()
         self.backward_D()
         self.optimize_D.step()
 
         # Genrator
+        self.set_requires_grad([self.G], True)
         self.optimize_G.zero_grad()
         self.backward_G()
         self.optimize_G.step()

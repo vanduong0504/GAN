@@ -61,3 +61,11 @@ class base(ABC):
             path = os.path.join(self.opt.save_path, self.opt.model, self.opt.dataset, name)
             net = getattr(self, name)
             torch.save(net.state_dict(), check_folder(path) + f"/{name}_{epoch}.pth")
+
+    def set_requires_grad(self, nets, requires_grad=False):
+        if not isinstance(nets, list):
+            nets = [nets]
+        for net in nets:
+            if net is not None:
+                for param in net.parameters():
+                    param.requires_grad = requires_grad
