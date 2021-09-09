@@ -127,17 +127,17 @@ class GANModel(base):
         self.loss_G = self.adversarial_loss(pred_fake, torch.ones_like(pred_fake))
         self.loss_G.backward()
 
-    def optimize_parameters(self):
+    def optimize_parameters(self,batch_idx):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one epoch.
         """
         self.forward()
-
+        if batch_idx + 1 % 5 == 0:
         # Discriminator 
-        self.set_requires_grad([self.G], False)
-        self.optimize_D.zero_grad()
-        self.backward_D()
-        self.optimize_D.step()
+            self.set_requires_grad([self.G], False)
+            self.optimize_D.zero_grad()
+            self.backward_D()
+            self.optimize_D.step()
 
         # Genrator
         self.set_requires_grad([self.G], True)

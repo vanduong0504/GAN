@@ -22,7 +22,7 @@ class base(ABC):
         pass
 
     @abstractmethod
-    def optimize_parameters(self):
+    def optimize_parameters(self, batch_idx):
         pass
 
     def train(self):

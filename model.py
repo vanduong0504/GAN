@@ -48,7 +48,7 @@ class net:
 
                 net.set_input(inputs, labels)
                 net.forward()
-                batch_loss = net.optimize_parameters()
+                batch_loss = net.optimize_parameters(batch_idx)
 
                 loop.set_description(f"Epoch [{epoch+1}/{opt.epoch}]")
                 loop.set_postfix(OrderedDict(zip(net.loss_name, batch_loss)))
