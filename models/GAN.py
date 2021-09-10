@@ -9,23 +9,16 @@ class Generator(nn.Module):
     def __init__(self, noise_dim, img_size):
         super(Generator, self).__init__()
 
-        self.layer1 = self.make_layer(in_cha=noise_dim, out_cha=128)
-        self.layer2 = self.make_layer(in_cha=128, out_cha=256)
-        self.layer3 = self.make_layer(in_cha=256, out_cha=512)
-        self.layer4 = self.make_layer(in_cha=512, out_cha=256)
-        self.layer5 = self.make_layer(in_cha=256, out_cha=128)
-        self.layer6 = self.make_layer(in_cha=128, out_cha=img_size, type=False)
-        self.tanh = nn.Tanh()
+        self.gen = nn.Sequential(
+                    self.make_layer(in_cha=noise_dim, out_cha=128),
+                    self.make_layer(in_cha=128, out_cha=256),
+                    self.make_layer(in_cha=256, out_cha=64),
+                    self.make_layer(in_cha=64, out_cha=1024),
+                    self.make_layer(in_cha=1024, out_cha=img_size, type=False),
+                    nn.Tanh())
 
     def forward(self, input):
-        output = self.layer1(input)
-        output = self.layer2(output)
-        output = self.layer3(output)
-        output = self.layer4(output)
-        output = self.layer5(output)
-        output = self.layer6(output)
-
-        return self.tanh(output)
+        return self.gen(input)
 
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
@@ -36,8 +29,7 @@ class Generator(nn.Module):
         layer += [nn.Linear(in_features=in_cha, out_features=out_cha)]
 
         if type is True:
-            layer += [nn.BatchNorm1d(num_features=out_cha)]
-            layer += [nn.LeakyReLU(negative_slope=0.2, inplace=True)]
+            layer += [nn.ReLU(inplace=True)]
 
         return nn.Sequential(*layer)
 
@@ -46,17 +38,15 @@ class Discriminator(nn.Module):
     def __init__(self, img_size):
         super(Discriminator, self).__init__()
 
-        self.layer1 = self.make_layer(in_cha=img_size, out_cha=512)
-        self.layer2 = self.make_layer(in_cha=512, out_cha=256)
-        self.layer3 = self.make_layer(in_cha=256, out_cha=1, type=False)
-        self.sigmoid = nn.Sigmoid()
+        self.disc = nn.Sequential(
+                    self.make_layer(in_cha=img_size, out_cha=64),
+                    self.make_layer(in_cha=64, out_cha=256),
+                    self.make_layer(in_cha=256, out_cha=128),
+                    self.make_layer(in_cha=128, out_cha=1, type=False),
+                    nn.Sigmoid())
 
     def forward(self, input):
-        output = self.layer1(input)
-        output = self.layer2(output)
-        output = self.layer3(output)
-
-        return self.sigmoid(output)
+        return self.disc(input)
 
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
@@ -116,36 +106,41 @@ class GANModel(base):
         pred_fake = self.D(self.fake)
         self.loss_fake = self.adversarial_loss(pred_fake, torch.zeros_like(pred_fake))
 
-        self.loss_D = (self.loss_real + self.loss_fake) * 0.5
-        self.loss_D.backward(retain_graph=True)
+        loss_D = (self.loss_real + self.loss_fake) * 0.5
+        loss_D.backward(retain_graph=True)
+        return loss_D
 
     def backward_G(self):
         """
         This function use to build calculate the loss of Generator.
         """
         pred_fake = self.D(self.fake)
-        self.loss_G = self.adversarial_loss(pred_fake, torch.ones_like(pred_fake))
-        self.loss_G.backward()
+        loss_G = self.adversarial_loss(pred_fake, torch.ones_like(pred_fake))
+        loss_G.backward()
+        return loss_G
 
-    def optimize_parameters(self,batch_idx):
+    def optimize_parameters(self, batch_idx):
         """
-        This function combine of Genrator loss, Discriminator loss and optimizer step for one epoch.
+        This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """
+        self.loss_D = 0
+        self.loss_G = 0
+
         self.forward()
-        if batch_idx + 1 % 5 == 0:
-        # Discriminator 
+
+        # Discriminator
+        if (batch_idx + 1) % 5 == 0: # 5 iterations update Discriminator 1 time
             self.set_requires_grad([self.G], False)
             self.optimize_D.zero_grad()
-            self.backward_D()
+            self.loss_D = self.backward_D().item()
             self.optimize_D.step()
 
         # Genrator
         self.set_requires_grad([self.G], True)
         self.optimize_G.zero_grad()
-        self.backward_G()
+        self.loss_G = self.backward_G().item()
         self.optimize_G.step()
-
-        return [self.loss_G.item(), self.loss_D.item()]
+        return [self.loss_G, self.loss_D]
 
     def evaluate_model(self):
         with torch.no_grad():

@@ -1,5 +1,6 @@
 import os
 import time
+import torch
 from utils import *
 import numpy as np
 from tqdm import tqdm
@@ -40,28 +41,28 @@ class net:
         write_image = create_logger(path_log, "Image", self.net.image_name)
 
         for epoch in range(opt.base_epoch + opt.epoch):
-            net.train()
-            # Use for print loss while training
             loss = current_losses(net.loss_name)
             loop = tqdm(enumerate(loader), total=len(loader), position=0, leave=True)
             for batch_idx, (inputs, labels) in loop:
 
                 net.set_input(inputs, labels)
-                net.forward()
                 batch_loss = net.optimize_parameters(batch_idx)
-
+                
+                # training display
                 loop.set_description(f"Epoch [{epoch+1}/{opt.epoch}]")
                 loop.set_postfix(OrderedDict(zip(net.loss_name, batch_loss)))
                 time.sleep(0.1)
 
                 for i, keys in enumerate(loss):
                     loss[keys].append(batch_loss[i])
-
+                
+                # tensorboard image 
                 if (batch_idx + 1) % len(loader) == 0:
                     image = grid_image(net.image_name, net.evaluate_model())
                     for i, (keys, writer) in enumerate(write_image.items()):
+                        print(image[i].size())
                         writer.add_image(keys, image[i], global_step=epoch)
-
+            # tensorboard loss
             for keys, writer in write_loss.items():
                 writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)
 
@@ -69,9 +70,13 @@ class net:
                 print('SAVE')
                 net.save_networks(epoch + 1)
 
-            print(f'Epoch[{epoch+1}/{opt.epoch}]: ' + ' '.join(f'{key}: {np.mean(value)}' for key, value in loss.items()))
-
+            print(f'Epoch[{epoch+1}/{opt.epoch}]: ' + 
+            ' '.join(f'{key}: {np.mean(list(filter(lambda num: num != 0, value)))}' for key, value in loss.items()))
+            
     def test(self):
-        if self.opt.model in ("GAN", "cGAN", "DCGAN"):
-            self.net.load_networks()
-        #######
+        self.build_model()
+        self.net.load_networks(self.opt.epoch)
+        if self.opt.model in ['GAN', 'DCGAN', 'cGAN']:
+            noise = torch.rand(self.opt.bach_size, self.net.noise_dim)
+            image = self.net.G(noise)
+            save_image(image, self.opt.result_dir)

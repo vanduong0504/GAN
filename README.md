@@ -18,7 +18,7 @@ Generate image can be seen with `Tensorboard`with `--log_dir=./logs` by default.
 
 <h2> :pushpin: Note </h2>
 
-Currently support  `--dataset=[mnist, fashionmnist]` for some basic GAN models and `--phase=train`. Additional datasets and models will arrive in the future. 
+Currently support  `--dataset=[mnist]` for some basic GAN models. Additional datasets and models will arrive in the future. 
 
 You can build your custom dataset in `dataset.py`.
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)

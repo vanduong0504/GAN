@@ -14,12 +14,12 @@ class Options:
         parser.add_argument("--dataroot", type=str, default="./data",
                             help="Path to datasets. (default: `./data`)")
         parser.add_argument("--dataset", type=str, default="mnist",
-                            help="Dataset name [mnist / fmnist]")
+                            help="Dataset name [mnist]")
         parser.add_argument("--c", default=1, type=int, metavar="CHANNELS",
                             help="Number of image channels. (default: 1)")
         parser.add_argument("--classes", default=10, type=int,
                             help="Number of classes. (default: 10)")
-        parser.add_argument('--resize', type=int, default=32,
+        parser.add_argument('--resize', type=int, default=28,
                             help='scale images to this size')
         #train option
         parser.add_argument("--epoch", default=50, type=int,

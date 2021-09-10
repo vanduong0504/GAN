@@ -1,7 +1,7 @@
 import os
 import torch.nn as nn
 from collections import OrderedDict
-from torchvision.utils import make_grid
+from torchvision.utils import make_grid, save_image
 from torch.utils.tensorboard import SummaryWriter
 
 
@@ -38,7 +38,6 @@ def create_logger(save_dir, folder, log):
     This function to create tensorboard events for models.
     """
     write = OrderedDict()
-    #path_log = os.path.join(save_dir,model,dataset)
     for item in log:
         write[item] = SummaryWriter(os.path.join(save_dir, folder, item))
     return write
@@ -60,5 +59,10 @@ def grid_image(image_name, output):
     """
     grid = []
     for i, name in enumerate(image_name):
-        grid += [make_grid(output[i], normalize=True)]
+        print(name, output[i].size())
+        grid += [make_grid(output[i], nrow=5)]
     return grid
+
+
+def save_image(image, dir):
+    save_image(image, f"{dir}/image.png", nrow=5, normalize=True)

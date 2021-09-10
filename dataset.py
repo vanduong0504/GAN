@@ -9,8 +9,6 @@ class DATASET:
         self.resize = resize
         if dataset == "mnist":
             self.train = MNIST(root=self.save_folder, train=True, download=True, transform=self.transform())
-        else:
-            self.train = FashionMNIST(root=self.save_folder, train=True, download=True, transform=self.transform())
 
     def transform(self):
         return transforms.Compose(

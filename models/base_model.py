@@ -1,7 +1,6 @@
 import os
 import torch
 from utils import *
-from option import Options
 from abc import ABC, abstractmethod
 
 
