@@ -58,10 +58,10 @@ class net:
                 
                 # tensorboard image 
                 if (batch_idx + 1) % len(loader) == 0:
-                    image = grid_image(net.image_name, net.evaluate_model())
+                    image = grid_image(net.evaluate_model())
                     for i, (keys, writer) in enumerate(write_image.items()):
-                        print(image[i].size())
                         writer.add_image(keys, image[i], global_step=epoch)
+                        
             # tensorboard loss
             for keys, writer in write_loss.items():
                 writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)

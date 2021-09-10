@@ -1,6 +1,7 @@
 import os
 import torch.nn as nn
 from collections import OrderedDict
+from torchvision.transforms.functional import normalize
 from torchvision.utils import make_grid, save_image
 from torch.utils.tensorboard import SummaryWriter
 
@@ -53,14 +54,13 @@ def current_losses(loss_name):
     return loss
 
 
-def grid_image(image_name, output):
+def grid_image(output):
     """
     This function to build grid_image to visualize images in Tensorboard.
     """
     grid = []
-    for i, name in enumerate(image_name):
-        print(name, output[i].size())
-        grid += [make_grid(output[i], nrow=5)]
+    for data in output:
+        grid += [make_grid(data, nrow=5, normalize=True)]
     return grid
 
 
