@@ -46,7 +46,8 @@ class net:
             loss = current_losses(net.loss_name)
             loop = tqdm(enumerate(loader), total=len(loader), position=0, leave=True)
             for batch_idx, (inputs, labels) in loop:
-
+                
+                net.train()
                 net.set_input(inputs, labels)
                 batch_loss = net.optimize_parameters(batch_idx)
                 
@@ -58,7 +59,8 @@ class net:
                 for i, keys in enumerate(loss):
                     loss[keys].append(batch_loss[i])
                 
-                # tensorboard image 
+                # tensorboard image
+                net.eval()
                 if (batch_idx + 1) % len(loader) == 0:
                     image = grid_image(net.evaluate_model())
                     for i, (keys, writer) in enumerate(write_image.items()):

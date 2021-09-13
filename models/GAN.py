@@ -29,7 +29,7 @@ class Generator(nn.Module):
         layer += [nn.Linear(in_cha, out_cha)]
 
         if type is True:
-            layer += [nn.BatchNorm1d(out_cha, eps=0.8)]
+            layer += [nn.BatchNorm1d(out_cha)]
             layer += [nn.ReLU(True)]
 
         return nn.Sequential(*layer)
@@ -47,8 +47,8 @@ class Discriminator(nn.Module):
                     nn.Sigmoid())
 
     def forward(self, input):
-        return self.disc(input).view(-1,1)
-
+        return self.disc(input)
+        
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
         """
@@ -141,6 +141,6 @@ class Model(base):
 
     def evaluate_model(self):
         with torch.no_grad():
-          real = self.real.reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
-          fake = self.G(self.fixed_noise).reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
-          return [real[0:25], fake[0:25]]
+            real = self.real.reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
+            fake = self.G(self.fixed_noise).reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
+            return [real[0:25], fake[0:25]]
