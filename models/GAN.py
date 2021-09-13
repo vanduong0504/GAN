@@ -63,12 +63,12 @@ class Discriminator(nn.Module):
         return nn.Sequential(*layer)
 
 
-class GANModel(base):
+class Model(base):
     def __init__(self, opt):
         """
         This class use to build GAN with Generator and Discriminator.
         """
-        super(GANModel, self).__init__(opt)
+        super(Model, self).__init__(opt)
         self.opt = opt
         self.img_size = opt.resize * opt.resize
 

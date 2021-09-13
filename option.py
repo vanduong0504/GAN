@@ -8,38 +8,38 @@ class Options:
     """
     def initialize(self, parser):
         parser.add_argument("--model", type=str, default="GAN",
-                            help="[GAN,...]")
+                            help="[GAN, DCGAN]")
         parser.add_argument("--phase", type=str, default="train",
                             help="[train / test]")
         parser.add_argument("--dataroot", type=str, default="./data",
-                            help="Path to datasets. (default: `./data`)")
+                            help="Path to datasets.")
         parser.add_argument("--dataset", type=str, default="mnist",
                             help="Dataset name [mnist]")
         parser.add_argument("--c", default=1, type=int, metavar="CHANNELS",
-                            help="Number of image channels. (default: 1)")
+                            help="Number of image channels.")
         parser.add_argument("--classes", default=10, type=int,
-                            help="Number of classes. (default: 10)")
-        parser.add_argument('--resize', type=int, default=28,
+                            help="Number of classes.")
+        parser.add_argument('--resize', type=int, default=32,
                             help='scale images to this size')
         #train option
         parser.add_argument("--epoch", default=50, type=int,
-                            help="Number of total epochs to run. (default: 50)")
+                            help="Number of total epochs to run.")
         parser.add_argument("--batch_size", default=32, type=int, metavar="BS",
-                            help="Input batch size. (default: 32)")
+                            help="Input batch size.")
         parser.add_argument("--lr", type=float, default=3e-4,
-                            help="Learning rate. (default:3e-4)")
+                            help="Learning rate.")
         parser.add_argument("--device", type=str, default="cuda",
                             help="Set gpu mode: [cpu, cuda]")
         parser.add_argument("--base_epoch", type=int, default=0,
                             help="base epoch to resume training")                    
         parser.add_argument("--result_dir", type=str, default="./results", metavar="RD",
-                            help="Directory to save the results. (default: `./results`)")
+                            help="Directory to save the results.")
         parser.add_argument("--log_dir", type=str, default="./logs", metavar="RD",
-                            help="Directory to save the log. (default: `./logs`)")
+                            help="Directory to save the log.")
         parser.add_argument("--save_freq", type=int, default=10, metavar="SF",
-                            help="Number of epochs to save the latest results. (default: 10)")
+                            help="Number of epochs to save the latest results.")
         parser.add_argument("--save_path", type=str, default="./weights", metavar="SP",
-                            help="Directory to save weight. (default: `./weights`)")
+                            help="Directory to save weight.")
         #restore option
         parser.add_argument("--restore_G_path", type=str, default=None, metavar="rG",
                             help='the path to restore the generator.')

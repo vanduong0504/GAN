@@ -63,14 +63,13 @@ class Discriminator(nn.Module):
         return nn.Sequential(*layer)
 
 
-class GANModel(base):
+class Model(base):
     def __init__(self, opt):
         """
         This class use to build GAN with Generator and Discriminator.
         """
-        super(GANModel, self).__init__(opt)
+        super(Model, self).__init__(opt)
         self.opt = opt
-        self.img_size = opt.resize * opt.resize
 
         self.image_name = ['Real', 'Fake']
         self.loss_name = ['loss_G', 'loss_D']
@@ -78,8 +77,8 @@ class GANModel(base):
 
         self.noise_dim = 64
         self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim)[:,:, None, None].to(opt.device)
-        self.G = Generator(noise_dim=self.noise_dim, img_size=self.img_size).to(opt.device)
-        self.D = Discriminator(img_size=self.img_size).to(opt.device)
+        self.G = Generator(self.noise_dim, self.opt.c).to(opt.device)
+        self.D = Discriminator(self.opt.c).to(opt.device)
         self.adversarial_loss = nn.BCELoss()
 
         self.get_net = self.get_network(self.model_name, net=(self.G, self.D))
@@ -88,7 +87,7 @@ class GANModel(base):
         self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr)
 
     def set_input(self, input, label):
-        self.real = input[:, :, None, None].to(self.opt.device)
+        self.real = input.to(self.opt.device)
         self.noise = torch.randn(input.size(0), self.noise_dim)[:,:, None, None].to(self.opt.device)
 
     def forward(self):

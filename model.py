@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 from dataset import DATASET
 from option import Options
-from models import GAN
+from models import GAN, DCGAN
 
 
 class net:
@@ -22,7 +22,9 @@ class net:
         self.loader = data.loader(data.train, self.opt.batch_size)
 
         if self.opt.model == "GAN":
-            self.net = GAN.GANModel(self.opt)
+            self.net = GAN.Model(self.opt)
+        elif self.opt.model == "DCGAN":
+            self.net = DCGAN.Model(self.opt)
 
         if self.opt.base_epoch:
             self.net.load_networks(self.opt.base_epoch)
