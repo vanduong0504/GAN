@@ -10,16 +10,16 @@ def init_weight(net, name):
     print(f"Weight Initialization for {name}")
     for layer in net.modules():
         if isinstance(layer, (nn.Conv2d, nn.ConvTranspose2d)):
-            nn.init.kaiming_uniform_(layer.weight, nonlinearity="leaky_relu")
+            nn.init.normal_(layer.weight, 0, 0.02)
             if layer.bias is not None:
                 nn.init.constant_(layer.bias, 0)
 
         elif isinstance(layer, (nn.BatchNorm1d, nn.BatchNorm2d)):
-            nn.init.constant_(layer.weight, 1)
+            nn.init.normal_(layer.weight, 0.0, 0.02)
             nn.init.constant_(layer.bias, 0)
 
         elif isinstance(layer, nn.Linear):
-            nn.init.kaiming_uniform_(layer.weight, nonlinearity="leaky_relu")
+            n.init.normal_(layer.weight, 0, 0.02)
             nn.init.constant_(layer.bias, 0)
 
 

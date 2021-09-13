@@ -10,11 +10,11 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
 
         self.gen = nn.Sequential(
-                    self.make_layer(noise_dim, 1024),
-                    self.make_layer(1024, 512),
+                    self.make_layer(noise_dim, 512),
                     self.make_layer(512, 256),
                     self.make_layer(256, 128),
-                    self.make_layer(128, channel, False),
+                    self.make_layer(128, 64),
+                    self.make_layer(64, channel, False),
                     nn.Tanh())
 
     def forward(self, input):
@@ -29,7 +29,7 @@ class Generator(nn.Module):
         layer += [nn.ConvTranspose2d(in_cha, out_cha, *(4,2,1))]
 
         if type is True:
-            layer += [nn.BatchNorm2d(out_cha, eps=0.8)]
+            layer += [nn.BatchNorm2d(out_cha)]
             layer += [nn.ReLU(True)]
 
         return nn.Sequential(*layer)
@@ -40,10 +40,10 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
 
         self.disc = nn.Sequential(
-                    self.make_layer(channel, 64),
-                    self.make_layer(64, 256),
-                    self.make_layer(256, 512),
-                    self.make_layer(512, 1, False),
+                    self.make_layer(channel, 16),
+                    self.make_layer(16, 32),
+                    self.make_layer(32, 64),
+                    self.make_layer(64, 1, False),
                     nn.Sigmoid())
 
     def forward(self, input):
