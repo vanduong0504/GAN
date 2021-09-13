@@ -29,6 +29,7 @@ class Generator(nn.Module):
         layer += [nn.Linear(in_features=in_cha, out_features=out_cha)]
 
         if type is True:
+            layer += [nn.BatchNorm1d(num_features=out_cha, eps=0.8)]
             layer += [nn.ReLU(inplace=True)]
 
         return nn.Sequential(*layer)
@@ -57,7 +58,6 @@ class Discriminator(nn.Module):
         layer += [nn.Linear(in_features=in_cha, out_features=out_cha)]
 
         if type is True:
-            layer += [nn.BatchNorm1d(num_features=out_cha)]
             layer += [nn.LeakyReLU(negative_slope=0.2, inplace=True)]
 
         return nn.Sequential(*layer)
@@ -129,11 +129,10 @@ class GANModel(base):
         self.forward()
 
         # Discriminator
-        if (batch_idx + 1) % 5 == 0: # 5 iterations update Discriminator 1 time
-            self.set_requires_grad([self.G], False)
-            self.optimize_D.zero_grad()
-            self.loss_D = self.backward_D().item()
-            self.optimize_D.step()
+        self.set_requires_grad([self.G], False)
+        self.optimize_D.zero_grad()
+        self.loss_D = self.backward_D().item()
+        self.optimize_D.step()
 
         # Genrator
         self.set_requires_grad([self.G], True)

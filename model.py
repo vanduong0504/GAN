@@ -61,7 +61,7 @@ class net:
                     image = grid_image(net.evaluate_model())
                     for i, (keys, writer) in enumerate(write_image.items()):
                         writer.add_image(keys, image[i], global_step=epoch)
-                        
+                
             # tensorboard loss
             for keys, writer in write_loss.items():
                 writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)
@@ -79,4 +79,4 @@ class net:
         if self.opt.model in ['GAN', 'DCGAN', 'cGAN']:
             noise = torch.rand(self.opt.bach_size, self.net.noise_dim)
             image = self.net.G(noise)
-            save_image(image, self.opt.result_dir)
+            save_result(image, self.opt.result_dir)
