@@ -6,16 +6,16 @@ from models.base_model import base
 
 
 class Generator(nn.Module):
-    def __init__(self, noise_dim, img_size):
+    def __init__(self, noise_dim, channel):
         super(Generator, self).__init__()
 
         self.gen = nn.Sequential(
-                    self.make_layer(noise_dim, 128),
-                    self.make_layer(128, 256),
-                    self.make_layer(256, 512),
-                    self.make_layer(512, 1024),
-                    self.make_layer(1024, img_size, False),
-                    nn.Tanh())    
+                    self.make_layer(noise_dim, 1024),
+                    self.make_layer(1024, 512),
+                    self.make_layer(512, 256),
+                    self.make_layer(256, 128),
+                    self.make_layer(128, channel, False),
+                    nn.Tanh())
 
     def forward(self, input):
         return self.gen(input)
@@ -26,21 +26,21 @@ class Generator(nn.Module):
         This function use to make layer of Generator, last layer don't need LeakyReLU or Batchnorm.
         """
         layer = []
-        layer += [nn.Linear(in_cha, out_cha)]
+        layer += [nn.ConvTranspose2d(in_cha, out_cha, *(4,2,1))]
 
         if type is True:
-            layer += [nn.BatchNorm1d(out_cha, eps=0.8)]
+            layer += [nn.BatchNorm2d(out_cha, eps=0.8)]
             layer += [nn.ReLU(True)]
 
         return nn.Sequential(*layer)
 
 
 class Discriminator(nn.Module):
-    def __init__(self, img_size):
+    def __init__(self, channel):
         super(Discriminator, self).__init__()
 
         self.disc = nn.Sequential(
-                    self.make_layer(img_size, 64),
+                    self.make_layer(channel, 64),
                     self.make_layer(64, 256),
                     self.make_layer(256, 512),
                     self.make_layer(512, 1, False),
@@ -55,7 +55,7 @@ class Discriminator(nn.Module):
         This function use to make layer of Generator, last layer don't need LeakyReLU or Batchnorm.
         """
         layer = []
-        layer += [nn.Linear(in_cha, out_cha)]
+        layer += [nn.Conv2d(in_cha, out_cha, *(4,2,1))]
 
         if type is True:
             layer += [nn.LeakyReLU(0.2, True)]
@@ -77,9 +77,9 @@ class GANModel(base):
         self.model_name = ['G', 'D']
 
         self.noise_dim = 64
-        self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim).to(opt.device)
-        self.G = Generator(self.noise_dim, self.img_size).to(opt.device)
-        self.D = Discriminator(self.img_size).to(opt.device)
+        self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim)[:,:, None, None].to(opt.device)
+        self.G = Generator(noise_dim=self.noise_dim, img_size=self.img_size).to(opt.device)
+        self.D = Discriminator(img_size=self.img_size).to(opt.device)
         self.adversarial_loss = nn.BCELoss()
 
         self.get_net = self.get_network(self.model_name, net=(self.G, self.D))
@@ -88,8 +88,8 @@ class GANModel(base):
         self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr)
 
     def set_input(self, input, label):
-        self.real = input.view(input.size(0),-1).to(self.opt.device)
-        self.noise = torch.randn(input.size(0), self.noise_dim).to(self.opt.device)
+        self.real = input[:, :, None, None].to(self.opt.device)
+        self.noise = torch.randn(input.size(0), self.noise_dim)[:,:, None, None].to(self.opt.device)
 
     def forward(self):
         self.fake = self.G(self.noise)
@@ -119,11 +119,10 @@ class GANModel(base):
         loss_G.backward()
         return loss_G
 
-    def optimize_parameters(self, batch_idx):
+    def optimize_parameters(self, batch_idx = None):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """
-
         self.forward()
 
         # Discriminator

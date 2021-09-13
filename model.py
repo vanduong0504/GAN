@@ -18,8 +18,8 @@ class net:
         """
         This function to build the dataset and model from class Option.
         """
-        data = DATASET(dataset=self.opt.dataset, save_folder=self.opt.dataroot, resize=self.opt.resize)
-        self.loader = data.loader(data.train, batch_sizes=self.opt.batch_size)
+        data = DATASET(self.opt.dataset, self.opt.dataroot, self.opt.resize)
+        self.loader = data.loader(data.train, self.opt.batch_size)
 
         if self.opt.model == "GAN":
             self.net = GAN.GANModel(self.opt)
