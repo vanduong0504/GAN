@@ -19,7 +19,7 @@ def init_weight(net, name):
             nn.init.constant_(layer.bias, 0)
 
         elif isinstance(layer, nn.Linear):
-            n.init.normal_(layer.weight, 0, 0.02)
+            nn.init.normal_(layer.weight, 0, 0.02)
             nn.init.constant_(layer.bias, 0)
 
 

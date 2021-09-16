@@ -1,6 +1,6 @@
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST, FashionMNIST
+from torchvision.datasets import MNIST, CelebA
 
 
 class DATASET:
@@ -8,7 +8,9 @@ class DATASET:
         self.save_folder = save_folder
         self.resize = resize
         if dataset == "mnist":
-            self.train = MNIST(root=self.save_folder, train=True, download=True, transform=self.transform())
+            self.train = MNIST(self.save_folder, True, True, self.transform())
+        if dataset == "celebA":
+            self.train = CelebA(self.save_folder, True, True, self.transform())
 
     def transform(self):
         return transforms.Compose(

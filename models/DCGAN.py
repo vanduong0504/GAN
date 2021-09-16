@@ -23,7 +23,7 @@ class Generator(nn.Module):
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
         """
-        This function use to make layer of Generator, last layer don't need LeakyReLU or Batchnorm.
+        This function use to make layer of Generator, last layer don't need ReLU or Batchnorm.
         """
         layer = []
         layer += [nn.ConvTranspose2d(in_cha, out_cha, *(4,2,1))]
@@ -47,7 +47,7 @@ class Discriminator(nn.Module):
                     nn.Sigmoid())
 
     def forward(self, input):
-        return self.disc(input).view(-1,1)
+        return self.disc(input).view(-1, 1)
 
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
@@ -58,6 +58,7 @@ class Discriminator(nn.Module):
         layer += [nn.Conv2d(in_cha, out_cha, *(4,2,1))]
 
         if type is True:
+            layer += [nn.BatchNorm2d(out_cha)]
             layer += [nn.LeakyReLU(0.2, True)]
 
         return nn.Sequential(*layer)
@@ -83,8 +84,8 @@ class Model(base):
 
         self.get_net = self.get_network(self.model_name, net=(self.G, self.D))
 
-        self.optimize_D = optim.Adam(self.D.parameters(), lr=opt.lr)
-        self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr)
+        self.optimize_D = optim.Adam(self.D.parameters(), lr=opt.lr, betas=(0.5,0.999))
+        self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr, betas=(0.5,0.999))
 
     def set_input(self, input, label):
         self.real = input.to(self.opt.device)

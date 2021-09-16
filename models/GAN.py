@@ -10,8 +10,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
 
         self.gen = nn.Sequential(
-                    self.make_layer(noise_dim, 128),
-                    self.make_layer(128, 256),
+                    self.make_layer(noise_dim, 256),
                     self.make_layer(256, 512),
                     self.make_layer(512, 1024),
                     self.make_layer(1024, img_size, False),
@@ -23,14 +22,13 @@ class Generator(nn.Module):
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
         """
-        This function use to make layer of Generator, last layer don't need LeakyReLU or Batchnorm.
+        This function use to make layer of Generator, last layer don't need LeakyReLU.
         """
         layer = []
         layer += [nn.Linear(in_cha, out_cha)]
 
         if type is True:
-            layer += [nn.BatchNorm1d(out_cha)]
-            layer += [nn.ReLU(True)]
+            layer += [nn.LeakyReLU(0.2)]
 
         return nn.Sequential(*layer)
 
@@ -40,10 +38,10 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
 
         self.disc = nn.Sequential(
-                    self.make_layer(img_size, 64),
-                    self.make_layer(64, 256),
-                    self.make_layer(256, 512),
-                    self.make_layer(512, 1, False),
+                    self.make_layer(img_size, 1024),
+                    self.make_layer(1024, 512),
+                    self.make_layer(512, 256),
+                    self.make_layer(256, 1, False),
                     nn.Sigmoid())
 
     def forward(self, input):
@@ -52,13 +50,14 @@ class Discriminator(nn.Module):
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
         """
-        This function use to make layer of Generator, last layer don't need LeakyReLU or Batchnorm.
+        This function use to make layer of Generator, last layer don't need LeakyReLU.
         """
         layer = []
         layer += [nn.Linear(in_cha, out_cha)]
 
         if type is True:
-            layer += [nn.LeakyReLU(0.2, True)]
+            layer += [nn.LeakyReLU(0.2)]
+            layer += [nn.Dropout(0.3)]
 
         return nn.Sequential(*layer)
 
@@ -77,7 +76,7 @@ class Model(base):
         self.model_name = ['G', 'D']
 
         self.noise_dim = 64
-        self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim).to(opt.device)
+        self.fixed_noise = torch.randn((opt.batch_size, self.noise_dim)).to(opt.device)
         self.G = Generator(self.noise_dim, self.img_size).to(opt.device)
         self.D = Discriminator(self.img_size).to(opt.device)
         self.adversarial_loss = nn.BCELoss()
@@ -89,7 +88,7 @@ class Model(base):
 
     def set_input(self, input, label):
         self.real = input.view(input.size(0),-1).to(self.opt.device)
-        self.noise = torch.randn(input.size(0), self.noise_dim).to(self.opt.device)
+        self.noise = torch.randn((input.size(0), self.noise_dim)).to(self.opt.device)
 
     def forward(self):
         self.fake = self.G(self.noise)
@@ -98,6 +97,7 @@ class Model(base):
         """
         This function use to build calculate the loss of Discriminator.
         """
+        
         # Real
         pred_real = self.D(self.real)
         self.loss_real = self.adversarial_loss(pred_real, torch.ones_like(pred_real))

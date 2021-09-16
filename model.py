@@ -76,7 +76,8 @@ class net:
                 net.save_networks(epoch + 1)
 
             print(f'Epoch[{epoch+1}/{opt.epoch}]: ' + 
-            ' '.join(f'{key}: {np.mean(list(filter(lambda num: num != 0, value)))}' for key, value in loss.items()))
+            ' '.join(f'{key}: {np.mean(list(filter(lambda num: num != 0, value))):.4f})' 
+            for key, value in loss.items()))
             
     def test(self):
         self.build_model()
