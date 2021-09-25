@@ -8,7 +8,7 @@ class Options:
     """
     def initialize(self, parser):
         parser.add_argument("--model", type=str, default="GAN",
-                            help="[GAN, DCGAN]")
+                            help="[GAN, DCGAN, WGAN]")
         parser.add_argument("--phase", type=str, default="train",
                             help="[train / test]")
         parser.add_argument("--dataroot", type=str, default="./data",
@@ -80,10 +80,8 @@ class Options:
         print()
 
     def gather_options(self):
-        parser = argparse.ArgumentParser(
-            description="Generate Image on MNIST and FashionMNIST")
+        parser = argparse.ArgumentParser(description="Generate Image on MNIST")
         self.parser = self.initialize(parser)
-
         return self.check_args(self.parser.parse_args())
 
     def parse(self):

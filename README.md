@@ -32,4 +32,3 @@ Status | Model
 :heavy_check_mark:| [WGAN](https://arxiv.org/abs/1701.07875)
 :x:| [cGAN](https://arxiv.org/abs/1411.1784)
 ...| ...
-V

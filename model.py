@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 from dataset import DATASET
 from option import Options
-from models import GAN, DCGAN
+from models import GAN, DCGAN, WGAN
 
 
 class net:
@@ -25,6 +25,8 @@ class net:
             self.net = GAN.Model(self.opt)
         elif self.opt.model == "DCGAN":
             self.net = DCGAN.Model(self.opt)
+        elif self.opt.model == "WGAN":
+            self.net = WGAN.Model(self.opt)
 
         if self.opt.base_epoch:
             self.net.load_networks(self.opt.base_epoch)
@@ -82,7 +84,7 @@ class net:
     def test(self):
         self.build_model()
         self.net.load_networks(self.opt.epoch)
-        if self.opt.model in ['GAN', 'DCGAN', 'cGAN']:
+        if self.opt.model in ['GAN', 'DCGAN', 'WGAN', 'cGAN']:
             noise = torch.rand(self.opt.bach_size, self.net.noise_dim)
             image = self.net.G(noise)
             save_result(image, self.opt.result_dir)
