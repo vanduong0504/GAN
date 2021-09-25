@@ -123,7 +123,6 @@ class Model(base):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """
-
         self.forward()
 
         # Discriminator
