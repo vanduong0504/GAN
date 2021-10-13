@@ -3,6 +3,3 @@ logs
 .vscode
 __pycache__
 weights
-test.py
-GAN.ipynb
-colab.ipynb

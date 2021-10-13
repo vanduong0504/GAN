@@ -64,10 +64,10 @@ class net:
                     loss[keys].append(batch_loss[i])
                 
                 # tensorboard image
-                
                 if (batch_idx + 1) % len(loader) == 0:
                     net.eval()
                     image = grid_image(net.evaluate_model())
+                    save_result(image, self.opt.result_dir, epoch)
                     for i, (keys, writer) in enumerate(write_image.items()):
                         writer.add_image(keys, image[i], global_step=epoch)
                 

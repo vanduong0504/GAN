@@ -64,5 +64,5 @@ def grid_image(output):
     return grid
 
 
-def save_result(image, dir):
-    save_image(image, f"{dir}/image.png", nrow=5, normalize=True)
+def save_result(image, dir, epoch):
+    save_image(image, f"{dir}/{epoch}.png", nrow=5, normalize=True)
