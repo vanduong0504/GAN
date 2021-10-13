@@ -13,7 +13,7 @@ class base(ABC):
         self.model_name = []
 
     @abstractmethod
-    def set_input(self, input, label):
+    def set_input(self, input=None, label=None):
         pass
 
     @abstractmethod
@@ -48,11 +48,19 @@ class base(ABC):
         return OrderedDict({name: net[i] for i, name in enumerate(model_name)})
 
     def load_networks(self, epoch):
-        for name in self.model_name:
-            net = getattr(self, "name", None)
-            path = os.path.join(self.opt.save_path, self.opt.model, self.opt.dataset, name)
-            load(net, path)
-            print(f"Load {name} of {self.opt.model} at epoch {epoch}")
+        if self.opt.phase == "train":
+            for name in self.model_name:
+                net = getattr(self, name, None)
+                path = os.path.join(self.opt.save_path, self.opt.model, self.opt.dataset, name, f"{name}_{epoch}.pth")
+                load(net, path)
+                print(f"Load {name} of {self.opt.model} at epoch {epoch}")
+        else:
+            for name in self.model_name:
+                if name.startswith("G"):
+                    net = getattr(self, name, None)
+                    path = os.path.join(self.opt.save_path, self.opt.model, self.opt.dataset, name, f"{name}_{epoch}.pth")
+                    load(net, path)
+                    print(f"Load {name} of {self.opt.model} at epoch {epoch}")
         print("Successfully finish loading!!!")
 
     def save_networks(self, epoch):

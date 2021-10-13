@@ -14,6 +14,9 @@ class net:
         opt = Options().parse()
         self.opt = opt
 
+        self.path_log = os.path.join(opt.log_dir, opt.model, opt.dataset)
+        self.image_dir = os.path.join(opt.image_dir, opt.model, opt.dataset, opt.phase)
+
     def build_model(self):
         """
         This function to build the dataset and model from class Option.
@@ -29,22 +32,22 @@ class net:
             self.net = WGAN.Model(self.opt)
         elif self.opt.model == "cGAN":
             self.net = cGAN.Model(self.opt)
-            
-        if self.opt.base_epoch:
-            self.net.load_networks(self.opt.base_epoch)
-        else:
-            for name, model in self.net.get_net.items():
-                init_weight(model, name)
-            print("Finishing!!!", end="\n\n")
+
+
+        if self.opt.phase == "train":
+            if self.opt.base_epoch: # resume training
+                self.net.load_networks(self.opt.base_epoch)
+            else:
+                for name, model in self.net.get_net.items():
+                    init_weight(model, name)
 
     def train(self):
         opt = self.opt
         net = self.net
         loader = self.loader
 
-        path_log = os.path.join(opt.log_dir, opt.model, opt.dataset)
-        write_loss = create_logger(path_log, "Loss", self.net.loss_name)
-        write_image = create_logger(path_log, "Image", self.net.image_name)
+        write_loss = create_logger(self.path_log, "Loss", self.net.loss_name)
+        write_image = create_logger(self.path_log, "Image", self.net.image_name)
 
         for epoch in range(opt.base_epoch + opt.epoch):
             loss = current_losses(net.loss_name)
@@ -67,7 +70,7 @@ class net:
                 if (batch_idx + 1) % len(loader) == 0:
                     net.eval()
                     image = grid_image(net.evaluate_model())
-                    save_result(image, self.opt.result_dir, epoch)
+                    save_result(image[-1], self.image_dir, epoch+1) # take generated images
                     for i, (keys, writer) in enumerate(write_image.items()):
                         writer.add_image(keys, image[i], global_step=epoch)
                 
@@ -79,14 +82,24 @@ class net:
                 print("SAVE")
                 net.save_networks(epoch + 1)
 
-            print(f"Epoch[{epoch+1}/{opt.epoch}]: " + 
-            " ".join(f"{key}: {np.mean(list(filter(lambda num: num != 0, value))):.4f})" 
-            for key, value in loss.items()))
+            print(f"Epoch[{epoch+1}/{opt.epoch}]: [" +
+            ", ".join([f"{key}={np.mean(list(filter(lambda num: num != 0, value))):.4f}" 
+            for key, value in loss.items()]) + "]")
             
     def test(self):
         self.build_model()
         self.net.load_networks(self.opt.epoch)
-        if self.opt.model in ["GAN", "DCGAN", "WGAN", "cGAN"]:
-            noise = torch.rand(self.opt.bach_size, self.net.noise_dim)
-            image = self.net.G(noise)
-            save_result(image, self.opt.result_dir)
+        self.net.G.eval()
+
+        dump_tensor = torch.randn(self.opt.batch_size, 1) # create a dump tensor because set_input() need batchsize
+        if self.opt.model in ["GAN", "WGAN", "DCGAN"]:
+            self.net.set_input(dump_tensor)
+        elif self.opt.model == "cGAN":
+            label = torch.randint(0, self.opt.num_class, size=self.opt.bach_size) # generate random labels
+            self.net.set_input(dump_tensor, label)
+
+        with torch.no_grad():
+            self.net.forward()
+            if self.opt.model == "GAN":
+                self.net.fake = self.net.fake.reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
+            save_result(self.net.fake, self.image_dir)

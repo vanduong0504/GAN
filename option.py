@@ -34,8 +34,8 @@ class Options:
                             help="Set gpu mode: [cpu, cuda]")
         parser.add_argument("--base_epoch", type=int, default=0,
                             help="base epoch to resume training")                    
-        parser.add_argument("--result_dir", type=str, default="./results", metavar="RD",
-                            help="Directory to save the results.")
+        parser.add_argument("--image_dir", type=str, default="./results", metavar="RD",
+                            help="Directory to save the image.")
         parser.add_argument("--log_dir", type=str, default="./logs", metavar="RD",
                             help="Directory to save the log.")
         parser.add_argument("--save_freq", type=int, default=10, metavar="SF",
@@ -54,7 +54,7 @@ class Options:
         This function to check for the arguments.
         """
         #--result_dir
-        check_folder(os.path.join(args.result_dir, args.model, args.dataset))
+        check_folder(os.path.join(args.image_dir, args.model, args.dataset, args.phase))
 
         #--epoch
         try:

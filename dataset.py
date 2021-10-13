@@ -19,4 +19,4 @@ class DATASET:
              transforms.Normalize(0.5, 0.5)])
 
     def loader(self, dataset, batch_sizes):
-        return DataLoader(dataset=dataset, batch_size=batch_sizes, shuffle=True, num_workers=4)
+        return DataLoader(dataset=dataset, batch_size=batch_sizes, shuffle=True, num_workers=2)

@@ -13,6 +13,13 @@ Other datasets depend on different tasks, e.g., **horsetozibra** for *CycleGAN*.
 ```
 python main.py --model "GAN" --phase "train"
 ```
+
+<h2> :computer: Test </h2>
+
+```
+python main.py --model "GAN" --phase "test" --epoch "your/epoch/for/loading/generator"
+```
+
 Generate image can be seen with `Tensorboard`with `--log_dir=./logs` by default.
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -22,6 +29,15 @@ Currently support  `--dataset=[mnist]` for some basic GAN models. Additional dat
 
 You can build your custom dataset in `dataset.py`.
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
+<h2> ::trophy:: Generated Images</h2>
+
+<ul>
+<li> GAN</li>
+<p align="center">
+  <img src="image/GAN/gan.gif" width=600>
+</p>
+</ul>
 
 <h2> :bookmark: Models </h2>
 

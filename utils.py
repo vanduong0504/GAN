@@ -1,7 +1,7 @@
 import os
+import torch
 import torch.nn as nn
 from collections import OrderedDict
-from torchvision.transforms.functional import normalize
 from torchvision.utils import make_grid, save_image
 from torch.utils.tensorboard import SummaryWriter
 
@@ -30,7 +30,7 @@ def check_folder(dir):
 
 
 def load(net, path):
-    net.load_state_dict(path)
+    net.load_state_dict(torch.load(path))
     return net
 
 
@@ -64,5 +64,9 @@ def grid_image(output):
     return grid
 
 
-def save_result(image, dir, epoch):
-    save_image(image, f"{dir}/{epoch}.png", nrow=5, normalize=True)
+def save_result(image, dir, epoch=None):
+    print(dir)
+    if epoch is not None:
+        save_image(image, f"{dir}/{epoch}.png", nrow=5, normalize=True)
+    else:
+        save_image(image, f"{dir}/test.png", nrow=int(image.size(0)/8), normalize=True)
