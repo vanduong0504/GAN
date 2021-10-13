@@ -35,7 +35,7 @@ You can build your custom dataset in `dataset.py`.
 <ol>
 <li> GAN</li>
 <p align="center">
-  <img src="image/GAN/gan.gif" width=600>
+  <img src="image/GAN/gan.gif" width=400>
 </p>
 </ol>
 
