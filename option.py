@@ -15,6 +15,8 @@ class Options:
                             help="Path to datasets.")
         parser.add_argument("--dataset", type=str, default="mnist",
                             help="Dataset name [mnist]")
+        parser.add_argument("--num_class", type=int, default=10, metavar="nC",
+                            help="Number of classes of the dataset.")                    
         parser.add_argument("--c", default=1, type=int, metavar="CHANNELS",
                             help="Number of image channels.")
         parser.add_argument("--classes", default=10, type=int,

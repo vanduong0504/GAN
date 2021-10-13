@@ -8,9 +8,9 @@ class DATASET:
         self.save_folder = save_folder
         self.resize = resize
         if dataset == "mnist":
-            self.train = MNIST(self.save_folder, True, True, self.transform())
+            self.train = MNIST(self.save_folder, True, download=True, transform=self.transform())
         if dataset == "celebA":
-            self.train = CelebA(self.save_folder, True, True, self.transform())
+            self.train = CelebA(self.save_folder, True, download=True, transform=self.transform())
 
     def transform(self):
         return transforms.Compose(
@@ -19,4 +19,4 @@ class DATASET:
              transforms.Normalize(0.5, 0.5)])
 
     def loader(self, dataset, batch_sizes):
-        return DataLoader(dataset=dataset, batch_size=batch_sizes, shuffle=True, num_workers=2)
+        return DataLoader(dataset=dataset, batch_size=batch_sizes, shuffle=True, num_workers=4)

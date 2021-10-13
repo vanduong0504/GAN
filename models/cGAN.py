@@ -79,8 +79,8 @@ class Model(base):
 
         self.noise_dim = 64
         self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim).to(opt.device)
-        self.G = Generator(self.noise_dim, self.opt.c).to(opt.device)
-        self.D = Discriminator(self.opt.c).to(opt.device)
+        self.G = Generator(self.noise_dim + self.opt.num_class, self.opt.c).to(opt.device)
+        self.D = Discriminator(self.opt.c + self.opt.num_class).to(opt.device)
         self.adversarial_loss = nn.BCELoss()
 
         self.get_net = self.get_network(self.model_name, net=(self.G, self.D))
@@ -90,8 +90,9 @@ class Model(base):
 
     def set_input(self, input, label):
         self.real = input.to(self.opt.device)
-        self.label = F.one_hot(label.to(self.opt.device))
-        self.noise = torch.cat((torch.randn(input.size(0), self.noise_dim), self.label), 1)[:,:, None, None].to(self.opt.device)
+        self.label = F.one_hot(label.to(self.opt.device), num_classes=self.opt.num_class)
+        noise = torch.randn(input.size(0), self.noise_dim, device=self.opt.device)
+        self.noise = torch.cat((noise, self.label), 1)[:,:, None, None].to(self.opt.device)
 
     def forward(self):
         self.fake = self.G(self.noise)
@@ -101,7 +102,7 @@ class Model(base):
         This function use to build calculate the loss of Discriminator.
         """
         image_one_hot_labels = self.label[:, :, None, None]
-        image_one_hot_labels = image_one_hot_labels.repeat(1, 1, self.real.size(1), self.real.size(2))
+        image_one_hot_labels = image_one_hot_labels.repeat(1, 1, self.real.size(2), self.real.size(3))
 
         # Real
         self.real_image_and_labels = torch.cat((self.real, image_one_hot_labels), 1)
