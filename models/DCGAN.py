@@ -77,7 +77,7 @@ class Model(base):
         self.model_name = ['G', 'D']
 
         self.noise_dim = 64
-        self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim)[:,:, None, None].to(opt.device)
+        self.fixed_noise = torch.randn(opt.batch_size, self.noise_dim).to(opt.device)
         self.G = Generator(self.noise_dim, self.opt.c).to(opt.device)
         self.D = Discriminator(self.opt.c).to(opt.device)
         self.adversarial_loss = nn.BCELoss()
@@ -140,6 +140,5 @@ class Model(base):
 
     def evaluate_model(self):
         with torch.no_grad():
-          real = self.real.reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
-          fake = self.G(self.fixed_noise).reshape(-1, self.opt.c, self.opt.resize, self.opt.resize)
-          return [real[0:25], fake[0:25]]
+          fake = self.G(self.fixed_noise[:,:, None, None])
+          return [self.real[0:25], fake[0:25]]

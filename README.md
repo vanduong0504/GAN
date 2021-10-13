@@ -30,5 +30,5 @@ Status | Model
 :heavy_check_mark:| [GAN](https://arxiv.org/abs/1406.2661)
 :heavy_check_mark:| [DCGAN](https://arxiv.org/abs/1511.06434)
 :heavy_check_mark:| [WGAN](https://arxiv.org/abs/1701.07875)
-:x:| [cGAN](https://arxiv.org/abs/1411.1784)
+:heavy_check_mark:| [cGAN](https://arxiv.org/abs/1411.1784)
 ...| ...
