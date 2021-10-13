@@ -8,7 +8,7 @@ class Options:
     """
     def initialize(self, parser):
         parser.add_argument("--model", type=str, default="GAN",
-                            help="[GAN, DCGAN, WGAN]")
+                            help="[GAN, DCGAN, WGAN, cGAN]")
         parser.add_argument("--phase", type=str, default="train",
                             help="[train / test]")
         parser.add_argument("--dataroot", type=str, default="./data",

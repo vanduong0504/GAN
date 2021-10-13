@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 from dataset import DATASET
 from option import Options
-from models import GAN, DCGAN, WGAN
+from models import GAN, DCGAN, WGAN, cGAN
 
 
 class net:
@@ -27,13 +27,15 @@ class net:
             self.net = DCGAN.Model(self.opt)
         elif self.opt.model == "WGAN":
             self.net = WGAN.Model(self.opt)
-
+        elif self.opt.model == "cGAN":
+            self.net = cGAN.Model(self.opt)
+            
         if self.opt.base_epoch:
             self.net.load_networks(self.opt.base_epoch)
         else:
             for name, model in self.net.get_net.items():
                 init_weight(model, name)
-            print("Finishing!!!", end='\n\n')
+            print("Finishing!!!", end="\n\n")
 
     def train(self):
         opt = self.opt
@@ -74,17 +76,17 @@ class net:
                 writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)
 
             if epoch % opt.save_freq == opt.save_freq - 1:
-                print('SAVE')
+                print("SAVE")
                 net.save_networks(epoch + 1)
 
-            print(f'Epoch[{epoch+1}/{opt.epoch}]: ' + 
-            ' '.join(f'{key}: {np.mean(list(filter(lambda num: num != 0, value))):.4f})' 
+            print(f"Epoch[{epoch+1}/{opt.epoch}]: " + 
+            " ".join(f"{key}: {np.mean(list(filter(lambda num: num != 0, value))):.4f})" 
             for key, value in loss.items()))
             
     def test(self):
         self.build_model()
         self.net.load_networks(self.opt.epoch)
-        if self.opt.model in ['GAN', 'DCGAN', 'WGAN', 'cGAN']:
+        if self.opt.model in ["GAN", "DCGAN", "WGAN", "cGAN"]:
             noise = torch.rand(self.opt.bach_size, self.net.noise_dim)
             image = self.net.G(noise)
             save_result(image, self.opt.result_dir)
