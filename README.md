@@ -30,14 +30,16 @@ Currently support  `--dataset=[mnist]` for some basic GAN models. Additional dat
 You can build your custom dataset in `dataset.py`.
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-<h2> ::trophy:: Generated Images</h2>
+<h2> :trophy: Generated Images</h2>
 
-<ul>
+<ol>
 <li> GAN</li>
 <p align="center">
   <img src="image/GAN/gan.gif" width=600>
 </p>
-</ul>
+</ol>
+
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 <h2> :bookmark: Models </h2>
 
