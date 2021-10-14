@@ -33,10 +33,21 @@ You can build your custom dataset in `dataset.py`.
 <h2> :trophy: Generated Images</h2>
 
 <ol>
-<li> GAN</li>
+<li> <b>GAN:</b> 100 epochs</li>
 <p align="center">
   <img src="image/GAN/gan.gif" width=400>
 </p>
+
+<li> <b>DCGAN:</b> 20 epochs</li>
+<p align="center">
+  <img src="image/DCGAN/dcgan.gif" width=400>
+</p>
+
+<li> <b>cCGAN:</b> 20 epochs</li>
+<p align="center">
+  <img src="image/cGAN/cgan.gif" width=400>
+</p>
+
 </ol>
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
