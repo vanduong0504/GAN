@@ -13,7 +13,7 @@ class base(ABC):
         self.model_name = []
 
     @abstractmethod
-    def set_input(self, input=None, label=None):
+    def set_input(self, input, label):
         pass
 
     @abstractmethod
@@ -21,7 +21,7 @@ class base(ABC):
         pass
 
     @abstractmethod
-    def optimize_parameters(self, batch_idx):
+    def optimize_parameters(self):
         pass
 
     def train(self):

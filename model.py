@@ -35,7 +35,7 @@ class net:
 
 
         if self.opt.phase == "train":
-            if self.opt.base_epoch: # resume training
+            if self.opt.base_epoch: # Resume training
                 self.net.load_networks(self.opt.base_epoch)
             else:
                 for name, model in self.net.get_net.items():
@@ -47,6 +47,7 @@ class net:
         loader = self.loader
 
         write_loss = create_logger(self.path_log, "Loss", self.net.loss_name)
+        write_grad = create_logger(self.path_log, "Grad", self.net.model_name)
         write_image = create_logger(self.path_log, "Image", self.net.image_name)
 
         for epoch in range(opt.base_epoch + opt.epoch):
@@ -56,9 +57,9 @@ class net:
                 
                 net.train()
                 net.set_input(inputs, labels)
-                batch_loss = net.optimize_parameters(batch_idx)
+                batch_loss = net.optimize_parameters()
                 
-                # training display
+                # Training display
                 loop.set_description(f"Epoch [{epoch+1}/{opt.epoch}]")
                 loop.set_postfix(OrderedDict(zip(net.loss_name, batch_loss)))
                 time.sleep(0.1)
@@ -66,15 +67,22 @@ class net:
                 for i, keys in enumerate(loss):
                     loss[keys].append(batch_loss[i])
                 
-                # tensorboard image
+                # Tensorboard image
                 if (batch_idx + 1) % len(loader) == 0:
                     net.eval()
                     image = grid_image(net.evaluate_model())
-                    save_result(image[-1], self.image_dir, epoch+1) # take generated images
+                    save_result(image[-1], self.image_dir, epoch+1) # Take generated images
                     for i, (keys, writer) in enumerate(write_image.items()):
                         writer.add_image(keys, image[i], global_step=epoch)
-                
-            # tensorboard loss
+
+                # Tensorboard gradient: debug purpose
+                for name in self.net.model_name:
+                    model = getattr(self.net, name)
+                    for name, param in model.named_parameters():
+                        for keys, writer in write_grad.items():
+                            writer.add_histogram(f'{name}.grad', param.grad, batch_idx)
+
+            # Tensorboard loss
             for keys, writer in write_loss.items():
                 writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)
 
@@ -91,11 +99,11 @@ class net:
         self.net.load_networks(self.opt.epoch)
         self.net.G.eval()
 
-        dump_tensor = torch.randn(self.opt.batch_size, 1) # create a dump tensor because set_input() need batchsize
+        dump_tensor = torch.randn(self.opt.batch_size, 1) # Create a dump tensor because set_input() need batchsize
         if self.opt.model in ["GAN", "WGAN", "DCGAN"]:
             self.net.set_input(dump_tensor)
         elif self.opt.model == "cGAN":
-            label = torch.randint(0, self.opt.num_class, size=self.opt.bach_size) # generate random labels
+            label = torch.randint(0, self.opt.num_class, size=self.opt.bach_size) # Generate random labels
             self.net.set_input(dump_tensor, label)
 
         with torch.no_grad():

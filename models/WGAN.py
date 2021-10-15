@@ -72,8 +72,8 @@ class Model(base):
         self.opt = opt
 
         self.image_name = ['Real', 'Fake']
-        self.loss_name = ['loss_G', 'loss_D']
-        self.model_name = ['G', 'D']
+        self.loss_name = ['loss_G', 'loss_C']
+        self.model_name = ['G', 'C']
 
         self.n_critic = 5
         self.clip_weight = 1e-2
@@ -83,7 +83,7 @@ class Model(base):
         self.G = Generator(self.noise_dim, self.opt.c).to(opt.device)
         self.C = Critic(self.opt.c).to(opt.device)
 
-        self.get_net = self.get_network(self.model_name, net=(self.G, self.D))
+        self.get_net = self.get_network(self.model_name, net=(self.G, self.C))
 
         self.optimize_C = optim.RMSprop(self.C.parameters(), lr=opt.lr)
         self.optimize_G = optim.RMSprop(self.G.parameters(), lr=opt.lr)
@@ -105,7 +105,7 @@ class Model(base):
         # Fake
         pred_fake = self.C(self.fake)
 
-        loss_C = torch.mean(pred_real) - torch.mean(pred_fake)
+        loss_C = torch.mean(pred_fake) - torch.mean(pred_real)
         loss_C.backward(retain_graph=True)
         return loss_C
 
@@ -113,12 +113,12 @@ class Model(base):
         """
         This function use to build calculate the loss of Generator.
         """
-        pred_fake = self.D(self.fake)
+        pred_fake = self.C(self.fake)
         loss_G = - torch.mean(pred_fake)
         loss_G.backward()
         return loss_G
 
-    def optimize_parameters(self, batch_idx = None):
+    def optimize_parameters(self):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """
@@ -126,22 +126,21 @@ class Model(base):
         self.forward()
         
         # Critic
-        if  batch_idx % self.n_critic:
+        for _ in range(self.n_critic):
             self.set_requires_grad([self.G], False)
             self.optimize_C.zero_grad()
             loss_C = self.backward_D().item()
             self.optimize_C.step()
-            
+        
             # Clip the weight to range[-cliping_weight, +cliping_weight]
             for param in self.C.parameters():
                 param.data.clip_(-self.clip_weight, self.clip_weight)
 
         # Genrator
-        else:
-            self.set_requires_grad([self.G], True)
-            self.optimize_G.zero_grad()
-            loss_G = self.backward_G().item()
-            self.optimize_G.step()
+        self.set_requires_grad([self.G], True)
+        self.optimize_G.zero_grad()
+        loss_G = self.backward_G().item()
+        self.optimize_G.step()
         
         return [loss_G, loss_C]
 

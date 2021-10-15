@@ -45,7 +45,7 @@ class Discriminator(nn.Module):
                     nn.Sigmoid())
 
     def forward(self, input):
-        return self.disc(input)
+        return self.disc(input).view(-1, 1)
         
     @staticmethod
     def make_layer(in_cha, out_cha, type=True):
@@ -86,7 +86,7 @@ class Model(base):
         self.optimize_D = optim.Adam(self.D.parameters(), lr=opt.lr)
         self.optimize_G = optim.Adam(self.G.parameters(), lr=opt.lr)
 
-    def set_input(self, input):
+    def set_input(self, input, label):
         self.real = input.view(input.size(0),-1).to(self.opt.device)
         self.noise = torch.randn((input.size(0), self.noise_dim)).to(self.opt.device)
 
@@ -119,7 +119,7 @@ class Model(base):
         loss_G.backward()
         return loss_G
 
-    def optimize_parameters(self, batch_idx):
+    def optimize_parameters(self):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """

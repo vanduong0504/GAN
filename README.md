@@ -20,7 +20,7 @@ python main.py --model "GAN" --phase "train"
 python main.py --model "GAN" --phase "test" --epoch "your/epoch/for/loading/generator"
 ```
 
-Generate image can be seen with `Tensorboard`with `--log_dir=./logs` by default.
+Generated images can be seen with `Tensorboard`with `--log_dir=./logs` by default.
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 <h2> :pushpin: Note </h2>

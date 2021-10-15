@@ -119,7 +119,7 @@ class Model(base):
         loss_G.backward()
         return loss_G
 
-    def optimize_parameters(self, batch_idx = None):
+    def optimize_parameters(self):
         """
         This function combine of Genrator loss, Discriminator loss and optimizer step for one iteration.
         """

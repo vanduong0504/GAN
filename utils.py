@@ -65,7 +65,6 @@ def grid_image(output):
 
 
 def save_result(image, dir, epoch=None):
-    print(dir)
     if epoch is not None:
         save_image(image, f"{dir}/{epoch}.png", nrow=5, normalize=True)
     else:
