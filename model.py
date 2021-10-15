@@ -68,23 +68,22 @@ class net:
                     loss[keys].append(batch_loss[i])
                 
                 # Tensorboard image
-                if (batch_idx + 1) % len(loader) == 0:
+                if batch_idx == 0:
                     net.eval()
                     image = grid_image(net.evaluate_model())
                     save_result(image[-1], self.image_dir, epoch+1) # Take generated images
-                    for i, (keys, writer) in enumerate(write_image.items()):
-                        writer.add_image(keys, image[i], global_step=epoch)
+                    for i, (name, writer) in enumerate(write_image.items()):
+                        writer.add_image(name, image[i], global_step=epoch)
 
                 # Tensorboard gradient: debug purpose
-                for name in self.net.model_name:
-                    model = getattr(self.net, name)
-                    for name, param in model.named_parameters():
-                        for keys, writer in write_grad.items():
-                            writer.add_histogram(f'{name}.grad', param.grad, batch_idx)
+                for name, writer in write_grad.items():
+                  sub_model = getattr(self.net, name)
+                  for layer, param in sub_model.named_parameters():
+                    writer.add_histogram(layer, param.grad, batch_idx)
 
             # Tensorboard loss
-            for keys, writer in write_loss.items():
-                writer.add_scalar(keys, np.mean(loss[keys]), global_step=epoch)
+            for name, writer in write_loss.items():
+                writer.add_scalar(name, np.mean(loss[keys]), global_step=epoch)
 
             if epoch % opt.save_freq == opt.save_freq - 1:
                 print("SAVE")
