@@ -1,6 +1,9 @@
 import os
 import torch
+import numpy as np
 import torch.nn as nn
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from collections import OrderedDict
 from torchvision.utils import make_grid, save_image
 from torch.utils.tensorboard import SummaryWriter
@@ -69,3 +72,4 @@ def save_result(image, dir, epoch=None):
         save_image(image, f"{dir}/{epoch}.png", nrow=5, normalize=True)
     else:
         save_image(image, f"{dir}/test.png", nrow=int(image.size(0)/8), normalize=True)
+        

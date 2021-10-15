@@ -47,7 +47,6 @@ class net:
         loader = self.loader
 
         write_loss = create_logger(self.path_log, "Loss", self.net.loss_name)
-        write_grad = create_logger(self.path_log, "Grad", self.net.model_name)
         write_image = create_logger(self.path_log, "Image", self.net.image_name)
 
         for epoch in range(opt.base_epoch + opt.epoch):
@@ -75,15 +74,9 @@ class net:
                     for i, (name, writer) in enumerate(write_image.items()):
                         writer.add_image(name, image[i], global_step=epoch)
 
-                # Tensorboard gradient: debug purpose
-                for name, writer in write_grad.items():
-                  sub_model = getattr(self.net, name)
-                  for layer, param in sub_model.named_parameters():
-                    writer.add_histogram(layer, param.grad, batch_idx)
-
             # Tensorboard loss
             for name, writer in write_loss.items():
-                writer.add_scalar(name, np.mean(loss[keys]), global_step=epoch)
+                writer.add_scalar(name, np.mean(loss[name]), global_step=epoch)
 
             if epoch % opt.save_freq == opt.save_freq - 1:
                 print("SAVE")
